@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block head_title %} {{ block.super }}- Login {% endblock head_title %}
+
+{% block content %}
+    <div id="login">
+    <div class="container">
+        <div id="login-row" class="row justify-content-center align-items-center">
+            <div id="login-column" class="col-md-6">
+                <div id="login-box" class="col-md-12">
+                    <form class="" action="{% url 'login' %}" method="POST" novalidate>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <input type="submit" class="btn btn-info" value="Login">
+                        <input type="hidden" name="next" value="{{ next}}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock content %}

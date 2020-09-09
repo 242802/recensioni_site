@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block head_title %}{{ block.super }} - Ricerca Avanzata{% endblock head_title %}
+
+{% block content %}
+
+<div id="login">
+    <div class="container">
+        <div id="login-row" class="row justify-content-center align-items-center">
+            <div id="login-column" class="col-md-6">
+                <div id="login-box" class="col-md-12">
+                    <form class=" my-2 my-lg-0" action="{% url 'risultati' %}">
+                      <input name="cosa" class="inputCerca form-control mr-sm-2" type="search" placeholder="cerca" aria-label="Search">
+                      <br>
+                      <div class="custom-control custom-checkbox">
+                        <input name="tipo1" class="inputCerca  mr-sm-2 custom-control-input" id="tipo1" type="checkbox" value="True">
+                          <label for="tipo1" class="custom-control-label" > HOTEL</label>
+                      </div>
+                      <br>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="inputCerca  mr-sm-2 custom-control-input" id="tipo2" name="tipo2" value="True">
+                        <label for="tipo2" class="custom-control-label"> RISTORANTE</label>
+                      </div>
+                      <br>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="inputCerca  mr-sm-2 custom-control-input" id="tipo3" name="tipo3" value="True">
+                          <label for="tipo3" class="custom-control-label"> FAST FOOD</label>
+                      </div>
+                      <br>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="inputCerca custom-control-input mr-sm-2 " id="tipo4" name="tipo4" value="True">
+                          <label for="tipo4" class="custom-control-label"> CASA VACANZA</label>
+                      </div>
+                      <br>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="inputCerca  mr-sm-2 custom-control-input" id="tipo5" name="tipo5" value="True">
+                          <label for="tipo5" class="custom-control-label"> AGRITURISMO</label>
+                      </div>
+                      <br>
+                        <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Cerca</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+
+{% endblock content %}

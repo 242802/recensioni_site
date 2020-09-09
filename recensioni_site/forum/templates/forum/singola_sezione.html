@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block head_title %} {{ block.super }}- {{ sezione.nome_sezione }} {% endblock head_title %}
+
+{% block content %}
+
+
+<div class=center>
+    <!--Carousel Wrapper-->
+    <img src="{{ sezione.logo_sezione.url }}" style="margin-left: auto; margin-right: auto; width: 100%;">
+</div>
+<div class=center1>
+    <div id="titlebar" class="listing-titlebar">
+        <div class="listing-titlebar-title">
+            <form id="user-rating-form">
+                <span class="user-rating1 float-right">
+
+                    <input type="radio" name="rating2" disabled class="deafultcheck5" value="5"><span class="star"></span>
+
+                    <input type="radio" name="rating2" disabled class="deafultcheck4" value="4"><span class="star"></span>
+
+                    <input type="radio" name="rating2"  disabled class="deafultcheck3" value="3"><span class="star"></span>
+
+                    <input type="radio" name="rating2"  disabled class="deafultcheck2" value="2"><span class="star"></span>
+
+                    <input type="radio" name="rating2"  disabled  class="deafultcheck1" value="1"><span class="star"></span>
+                </span>
+            </form>
+            <h2>{{sezione.nome_sezione}} <span class="listing-tag">Eat &amp; Drink</span></h2>
+            <h6>{{sezione.indirizzo}} - {{sezione.citta}} - {{sezione.provincia}}
+            <br>
+        </div>
+        <h4>{{sezione.descrizione}}</h4>
+        <br>
+                {% if sezione.hotelB %}
+                    <h5 style="color: #17a2b8;">hotel</h5>
+                {% endif %}
+
+                {% if sezione.ristoranteB %}
+                    <h5 style="color: #17a2b8;">ristorante</h5>
+                {% endif %}
+
+                {% if sezione.fastFoodB %}
+                    <h5 style="color: #17a2b8;">fastFood</h5>
+                {% endif %}
+
+                {% if sezione.casaVacanzaB %}
+                    <h5 style="color: #17a2b8;">casaVacanza</h5>
+                {% endif %}
+
+                {% if sezione.agriturismoB %}
+                    <h5 style="color: #17a2b8;">agriturismo</h5>
+                {% endif %}
+
+        <div class=center1>
+            <div id="map" style="width:100%;height:400px;"></div>
+        </div>
+    </div>
+</div>
+<br>
+
+{% for post in posts_discussione %}
+
+<div class="card mt-2">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-2">
+                <img src="https://image.ibb.co/jw55Ex/def_face.jpg" class="img img-rounded img-fluid" />
+                <p class="text-secondary text-center">{{ post.data_creazione }}</p>
+                <span class="idPost" style="display: none;"name="{{ post.rating }}">{{ post.id }}</span>
+            </div>
+            <div class="col-md-10">
+                <p>
+                    <a class="float-left"><strong>{{ post.autore_post }}</strong></a>
+                    <form id="user-rating-form" class="user-rating-form_{{post.id}}">
+                        <span class="user-rating1 float-right">
+                            <input type="radio" name="rating" disabled class="{{post.id}}check5" value="5"><span class="star"></span>
+                    
+                            <input type="radio" name="rating2" disabled class="{{post.id}}check4" value="4"><span class="star"></span>
+                    
+                            <input type="radio" name="rating2" disabled class="{{post.id}}check3" value="3"><span class="star"></span>
+                    
+                            <input type="radio" name="rating2" disabled class="{{post.id}}check2" value="2"><span class="star"></span>
+                    
+                            <input type="radio" name="rating2" disabled class="{{post.id}}check1" value="1"><span class="star"></span>
+                        </span>
+                    </form>
+                    
+
+                </p>
+                <div class="clearfix"></div>
+                <p>{{ post.contenuto }}</p>
+                <p>
+                    <form action="{% url 'like_post' post.pk %}" method="POST">
+                        {% csrf_token %}
+                        {{post}}
+                        <button type="submit" name="post_id" value="{{post.id}}"  class="float-right btn {{post.viewButton}}"> <i class="fa fa-heart"></i> {{post.total_likes}} Like</button>
+                    </form>
+            </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% if request.user.is_authenticated %}
+    {% include 'forum/form_risposta.html' %}
+{% endif %}
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvMnzPf-OSKu0NxNz6jIPFP_l12GJNY0A&libraries=places&v=weekly"
+    defer></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    
+<script>
+    $(document).ready(function () {
+        let map;
+        let service;
+        let infowindow;
+        let provincia= "{{ sezione.provincia }}"
+        let comune="{{ sezione.citta }}"
+        let via="{{ sezione.indirizzo }}"
+
+        function initMap() {
+            const sydney = new google.maps.LatLng(0, 0);
+            infowindow = new google.maps.InfoWindow();
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: sydney,
+                zoom: 15
+            });
+            const request = {
+                query: provincia +" " + comune+ " " + via,
+                fields: ["name", "geometry"]
+            };
+            service = new google.maps.places.PlacesService(map);
+            service.findPlaceFromQuery(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    for (let i = 0; i < results.length; i++) {
+                        createMarker(results[i]);
+                    }
+
+                    map.setCenter(results[0].geometry.location);
+                }
+            });
+        }
+
+        function createMarker(place) {
+            const marker = new google.maps.Marker({
+                map,
+                position: place.geometry.location
+            });
+            google.maps.event.addListener(marker, "click", () => {
+                infowindow.setContent(place.name);
+                infowindow.open(map);
+            });
+        }
+
+              initMap()
+    var rating = "{{ media_rating }}"
+    
+
+        $(document).ready(function () {
+
+                $('.deafultcheck' + rating ).prop("checked", true);
+            
+
+             });
+            });
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        $(".idPost").each(function (index) {
+            var selectorID = $(this).text()
+            var rating = $(this).attr('name')
+
+
+             $('.' + selectorID + 'check' + rating).prop("checked", true);
+        });
+
+
+
+
+    });
+</script>
+
+        <style>
+
+            .btn-danger.disabled, .btn-danger:disabled {
+                pointer-events: none;
+
+            }
+            
+            .card{
+                width:50%;
+                margin:auto;
+            }
+            .center1 {
+                margin: auto;
+                width: 59%;
+                padding: 20px;
+                border-radius: 10px;
+                border: 1px solid #9C9C9C;
+                background-color: #EAEAEA;
+            }
+
+            .center {
+                margin: auto;
+                width: 59%;
+                margin-top: 120px;
+
+                padding: 20px;
+                border-radius: 10px;
+            }
+
+            .listing-section {
+                display: inline-block;
+                width: 100%;
+            }
+
+             .user-rating1 {
+        direction: rtl;
+        font-size: 20px;
+        unicode-bidi: bidi-override;
+        padding: 10px 30px;
+        display: inline-block;
+    }
+
+    .user-rating1 input {
+        opacity: 0;
+        position: relative;
+        left: -15px;
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    .user-rating1 span.star:before {
+        color: #777777;
+        content: "ï€†";
+        /*padding-right: 5px;*/
+    }
+
+    .user-rating1 span.star {
+        display: inline-block;
+        font-family: FontAwesome;
+        font-style: normal;
+        font-weight: normal;
+        position: relative;
+        z-index: 1;
+    }
+
+    .user-rating1 span {
+        margin-left: -15px;
+    }
+
+    .user-rating1 span.star:before {
+        color: #777777;
+        content: "\f006";
+        /*padding-right: 5px;*/
+    }
+
+    .user-rating1 input:checked+span.star:before,
+    .user-rating1 input:checked+span.star~span.star:before {
+        color: #ffd100;
+        content: "\f005";
+    }
+        </style>
+
+        {% endblock content %}
