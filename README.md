@@ -1,4 +1,4 @@
-# RecensioniApp
+# Recensioni-Site
 
 ## 1- INSTALLAZIONE LIBRERIRE
 	pip install django-crispy-forms
